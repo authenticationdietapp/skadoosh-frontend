@@ -75,24 +75,6 @@
   transform: translateX(-50%);
 }
 
-.launch-flame {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 30px;
-  height: 68px;
-  border-radius: 50% 50% 45% 45%;
-  background: linear-gradient(180deg, #fff8bf 0%, #ffd44f 24%, #ff8a24 62%, #fb4320 100%);
-  filter: drop-shadow(0 0 15px rgba(255, 132, 31, 0.95));
-  opacity: 0;
-  transform: translateX(-50%) scaleY(0.2);
-}
-
-.launch-rocket-art--ignited .launch-flame {
-  opacity: 1;
-  animation: launch-flame-flicker 0.12s ease-in-out infinite alternate;
-}
-
 .launch-sequence-button {
   font-family: inherit;
   cursor: pointer;
@@ -105,16 +87,6 @@
 
   to {
     transform: translateY(120vh);
-  }
-}
-
-@keyframes launch-flame-flicker {
-  from {
-    transform: translateX(-50%) scaleY(0.82) scaleX(0.86);
-  }
-
-  to {
-    transform: translateX(-50%) scaleY(1.12) scaleX(1.12);
   }
 }
 
