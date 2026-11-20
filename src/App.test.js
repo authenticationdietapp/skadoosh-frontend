@@ -34,10 +34,13 @@ jest.mock('./components/Avatar3D.jsx', () => ({
 
 jest.mock('framer-motion', () => {
   const React = require('react');
-  const MotionElement = React.forwardRef(({
+  const createMotionElement = (tagName) => React.forwardRef(({
     animate,
     children,
+    exit,
+    initial,
     onAnimationComplete,
+    transition,
     ...props
   }, ref) => {
     React.useEffect(() => {
@@ -46,14 +49,16 @@ jest.mock('framer-motion', () => {
       }
     }, [animate, onAnimationComplete]);
 
-    return React.createElement('div', { ...props, ref }, children);
+    return React.createElement(tagName, { ...props, ref }, children);
   });
 
   return {
     AnimatePresence: ({ children }) => children,
     motion: {
-      div: MotionElement,
-      section: MotionElement,
+      div: createMotionElement('div'),
+      header: createMotionElement('header'),
+      main: createMotionElement('main'),
+      section: createMotionElement('section'),
     },
   };
 });
@@ -171,7 +176,7 @@ test('shows the launch gate at the root for a non-admin user while offline', asy
 
   render(<App />);
 
-  expect(await screen.findByRole('button', { name: 'Initiate Launch' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: /INITIATE LAUNCH/i })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'Coming Soon' })).not.toBeInTheDocument();
 });
 
@@ -185,7 +190,7 @@ test('redirects non-admin routes to the launch gate while the site is offline', 
 
   render(<App />);
 
-  expect(await screen.findByRole('button', { name: 'Initiate Launch' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: /INITIATE LAUNCH/i })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'Coming Soon' })).not.toBeInTheDocument();
   expect(window.location.pathname).toBe('/');
 });
@@ -222,15 +227,20 @@ test('allows a non-admin to launch the website while it is offline', async () =>
     await Promise.resolve();
   });
 
-  fireEvent.click(screen.getByRole('button', { name: 'Initiate Launch' }));
-  expect(screen.getByLabelText('Countdown 3')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: /INITIATE LAUNCH/i }));
+  expect(screen.getByLabelText('Countdown 10')).toBeInTheDocument();
 
-  for (let second = 0; second < 3; second += 1) {
+  for (let second = 0; second < 10; second += 1) {
     await act(async () => {
       jest.advanceTimersByTime(1000);
       await Promise.resolve();
     });
   }
+
+  await act(async () => {
+    jest.advanceTimersByTime(850);
+    await Promise.resolve();
+  });
 
   expect(siteSettingsUpdate).toHaveBeenCalledWith({ is_launched: true });
   await waitFor(() => {
